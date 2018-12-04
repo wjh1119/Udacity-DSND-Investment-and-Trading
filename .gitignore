@@ -13,7 +13,8 @@ build
 __pycache__
 
 # Jupyter Notebook:
-.ipynb_checkpoints
+*.ipynb_checkpoints
+*.ipynb
 
 # data
 finance/config.ini

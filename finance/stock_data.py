@@ -16,7 +16,7 @@ class StockData():
         '''
 
         cf = configparser.ConfigParser()
-        cf.read('config.ini')
+        cf.read('finance/config.ini')
         account = cf.get('user', 'account')
         password = cf.get('user', 'password')
         auth(account,password)
