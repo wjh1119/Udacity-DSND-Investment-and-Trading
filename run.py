@@ -13,46 +13,54 @@ app = Flask(__name__)
 # load data
 sd = StockData()
 
+
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-    
+
     # extract data needed for visuals
     price_000300_XSHG = sd.get_price("000300.XSHG")
 
-    chart_000300_XSHG = kline_chart(price_000300_XSHG,"深证300指数")
-    
+    chart_000300_XSHG = kline_chart(price_000300_XSHG, "深证300指数")
+
     # render web page with plotly graphs
-    return render_template('master.html',chart_000300_XSHG=chart_000300_XSHG.render_embed())
+    return render_template(
+        'master.html', chart_000300_XSHG=chart_000300_XSHG.render_embed())
 
 
-# web page that handles user query and displays model results
-# @app.route('/go')
-# def go():
-#     # save user input in query
-#     query = request.args.get('query', '') 
+# web page that handles user query and displays stock price indicator
+@app.route('/go')
+def go():
+    # save user input in query
+    query = request.args.get('query', '')
 
-#     # use model to predict classification for query
-#     classification_labels = model.predict([query])[0]
-#     classification_results = dict(zip(df.columns[4:], classification_labels))
+    # use model to predict price for query
+    price_query = sd.get_price(query)
 
-#     # This will render the go.html Please see that file. 
-#     return render_template(
-#         'go.html',
-#         query=query,
-#         classification_result=classification_results
-#     )
+    if type(price_query) == int:
+        return render_template(
+        'go.html', query=query, error_message="Could not find any information of this code, please check it or try it later!",chart_query="")
 
-def kline_chart(df,chart_name):
+    chart_query = kline_chart(price_query, sd.normalize_code(query))
 
-    print("type of df: %s" %str(type(df)))
-    date=df.index.tolist()
-    data=[]
-    for idx in df.index :
-        row=[df.loc[idx]['open'],df.loc[idx]['close'],df.loc[idx]['low'],df.loc[idx]['high']]
+    # This will render the go.html Please see that file.
+    return render_template(
+        'go.html', query=query, error_message="", chart_query=chart_query.render_embed())
+
+
+def kline_chart(df, chart_name):
+
+    print("type of df: %s" % str(type(df)))
+    date = df.index.tolist()
+    data = []
+    for idx in df.index:
+        row = [
+            df.loc[idx]['open'], df.loc[idx]['close'], df.loc[idx]['low'],
+            df.loc[idx]['high']
+        ]
         data.append(row)
-    kline = Kline(chart_name,width="100%")
+    kline = Kline(chart_name, width="100%")
     kline.add(
         "日K",
         date,
@@ -60,7 +68,7 @@ def kline_chart(df,chart_name):
         mark_point=["max"],
         is_datazoom_show=True,
     )
-    
+
     return kline
 
 

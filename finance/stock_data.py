@@ -45,7 +45,7 @@ class StockData():
             return -1
         
         if code == "000001.XSHE":
-            price_df = pd.read_csv("data/000001.SXHE.csv",index_col=0)
+            price_df = pd.read_csv("finance/data/000001.SXHE.csv",index_col=0)
             price_df = price_df.loc[start_date:end_date,:]
         else:
             security_info = get_security_info(code)

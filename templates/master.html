@@ -40,19 +40,23 @@
     <div class="jumbotron">
         <div class="container">
             <h1 class="text-center">Stock Price Indicator</h1>
-            <p class="text-center">show indicator</p>
+            <p class="text-center"></p>
             <hr />
 
+            {% block query_input %}
             <div class="row">
                 <div class="col-lg-12 form-group-lg">
                     <form action="/go" method="get">
                         <input type="text" class="form-control form-control-lg" name="query" placeholder="Enter a stock code to predict">
+                        <br />
+                        <br />
                         <div class="col-lg-offset-5">
                             <button type="submit" class="btn btn-lg btn-success">Enter a stock code to predict</button>
                         </div>
                     </form>
                 </div>
             </div>
+            {% endblock %}
 
             {% block message %}
             {% endblock %}
@@ -60,6 +64,7 @@
     </div>
 
     <div class="container">
+        {% block content %}
         <div class="row">
             <div class="col-lg-12 form-group-lg">
                 <div class="tile-body color transparent-black rounded-bottom-corners">
@@ -67,6 +72,7 @@
                 </div>
             </div>
         </div>
+        {% endblock %}
     </div>
 
 </body>
