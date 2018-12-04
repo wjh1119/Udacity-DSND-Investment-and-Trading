@@ -5,7 +5,7 @@ import pandas as pd
 from flask import Flask
 from flask import render_template, request, jsonify
 
-from pyecharts import Kline
+from finance.stock_chart import kline_chart
 from finance.stock_data import StockData
 
 app = Flask(__name__)
@@ -20,13 +20,13 @@ sd = StockData()
 def index():
 
     # extract data needed for visuals
-    price_000300_XSHG = sd.get_price("000300.XSHG")
+    normalized_name, price_000300_XSHG = sd.get_price("000300.XSHG")
 
-    chart_000300_XSHG = kline_chart(price_000300_XSHG, "深证300指数")
+    chart_000300_XSHG = kline_chart(price_000300_XSHG, "深证300指数").render_embed()
 
     # render web page with plotly graphs
     return render_template(
-        'master.html', chart_000300_XSHG=chart_000300_XSHG.render_embed())
+        'master.html', chart_000300_XSHG=chart_000300_XSHG)
 
 
 # web page that handles user query and displays stock price indicator
@@ -36,40 +36,23 @@ def go():
     query = request.args.get('query', '')
 
     # use model to predict price for query
-    price_query = sd.get_price(query)
+    normalized_codes, query_data, error_codes = sd.query_prices(query)
 
-    if type(price_query) == int:
-        return render_template(
-        'go.html', query=query, error_message="Could not find any information of this code, please check it or try it later!",chart_query="")
+    chart_query = None
+    error_message = ""
 
-    chart_query = kline_chart(price_query, sd.normalize_code(query))
+    if len(normalized_codes) == 0:
+        chart_query = ""
+    elif len(normalized_codes) == 1:
+        chart_query = kline_chart(query_data, normalized_codes[0]).render_embed()
+    elif len(normalized_codes) > 1:
+        chart_query = kline_chart(query_data, ",".join(normalized_codes)).render_embed()
 
-    # This will render the go.html Please see that file.
+    if len(error_codes) > 0:
+        error_message = "Could not find any information of these codes: %s, please check them!" %str(error_codes)
+    
     return render_template(
-        'go.html', query=query, error_message="", chart_query=chart_query.render_embed())
-
-
-def kline_chart(df, chart_name):
-
-    print("type of df: %s" % str(type(df)))
-    date = df.index.tolist()
-    data = []
-    for idx in df.index:
-        row = [
-            df.loc[idx]['open'], df.loc[idx]['close'], df.loc[idx]['low'],
-            df.loc[idx]['high']
-        ]
-        data.append(row)
-    kline = Kline(chart_name, width="100%")
-    kline.add(
-        "日K",
-        date,
-        data,
-        mark_point=["max"],
-        is_datazoom_show=True,
-    )
-
-    return kline
+        'go.html', query=query, error_message=error_message,chart_query=chart_query)
 
 
 def main():
