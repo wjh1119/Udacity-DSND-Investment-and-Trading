@@ -1,0 +1,24 @@
+# Windows:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python:
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+__pycache__
+
+# Jupyter Notebook:
+.ipynb_checkpoints
+
+# data
+finance/config.ini
+
+# bat
+*.bat
+
+

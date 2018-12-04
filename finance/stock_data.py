@@ -1,65 +1,76 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import os
+from datetime import datetime 
 
+import configparser
+from jqdatasdk import *
 
-def fill_missing_values(df_data):
-    """Fill missing values in data frame, in place."""
-    df_data.fillna(method="ffill", inplace=True)
-    df_data.fillna(method="bfill", inplace=True)
+class StockData():
+    
+    def __init__(self):
+        self.load_user_config()
+    
+    def load_user_config(self):
+        '''Add user information for getting stocks' data
+        '''
 
+        cf = configparser.ConfigParser()
+        cf.read('config.ini')
+        account = cf.get('user', 'account')
+        password = cf.get('user', 'password')
+        auth(account,password)
+        
+    
+    def get_price(self, code, start_date='2005-01-01', end_date='2018-11-30'):
+        '''Download stock data (adjusted close)
+        
+        Parameters
+        ----------------------
+        code: str or int
+            code of stock
+        start_date: str
+            start_date
+        end_date: str
+            end_date
+            
+        Returns
+        ----------------------
+        pd.DataFrame
+        '''
+        try:
+            code = self.normalize_code(str(code))
+        except Exception as e:
+            print(e)
+            return -1
+        
+        if code == "000001.XSHE":
+            price_df = pd.read_csv("data/000001.SXHE.csv",index_col=0)
+            price_df = price_df.loc[start_date:end_date,:]
+        else:
+            security_info = get_security_info(code)
+            security_start_date = security_info.start_date
+            security_end_date = security_info.end_date
 
-def symbol_to_path(symbol, base_dir="data"):
-    """Return CSV file path given ticker symbol."""
-    return os.path.join(base_dir, "{}.csv".format(str(symbol)))
+            # compare security date and requery date
+            if datetime.strptime(start_date,"%Y-%m-%d").date() < security_start_date:
+                start_date = security_start_date
+            if datetime.strptime(end_date,"%Y-%m-%d").date() > security_end_date:
+                end_date = security_end_date
 
+            price_df = get_price(code, start_date=start_date, end_date=end_date, frequency='daily', fields=None, 
+                                      skip_paused=False, fq='pre')
+        self.fill_missing_values(price_df)
+        
+        return price_df
+    
+    
+    def normalize_code(self,code):
+        '''Normalize code'''
+        return normalize_code(code)
+        
 
-def get_data(symbols, dates):
-    """Read stock data (adjusted close) for given symbols from CSV files."""
-    df_final = pd.DataFrame(index=dates)
-    if "SPY" not in symbols:  # add SPY for reference, if absent
-        symbols.insert(0, "SPY")
-
-    for symbol in symbols:
-        file_path = symbol_to_path(symbol)
-        df_temp = pd.read_csv(
-            file_path,
-            parse_dates=True,
-            index_col="Date",
-            usecols=["Date", "Adj Close"],
-            na_values=["nan"])
-        df_temp = df_temp.rename(columns={"Adj Close": symbol})
-        df_final = df_final.join(df_temp)
-        if symbol == "SPY":  # drop dates SPY did not trade
-            df_final = df_final.dropna(subset=["SPY"])
-
-    return df_final
-
-
-def plot_data(df_data):
-    """Plot stock data with appropriate axis labels."""
-    ax = df_data.plot(title="Stock Data", fontsize=2)
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Price")
-    plt.show()
-
-
-def test_run():
-    """Function called by Test Run."""
-    # Read data
-    symbol_list = ["JAVA", "FAKE1", "FAKE2"]  # list of symbols
-    start_date = "2005-12-31"
-    end_date = "2014-12-07"
-    dates = pd.date_range(start_date, end_date)  # date range as index
-    df_data = get_data(symbol_list, dates)  # get data for each symbol
-
-    # Fill missing values
-    fill_missing_values(df_data)
-
-    # Plot
-    plot_data(df_data)
-
-
-if __name__ == "__main__":
-    test_run()
+    def fill_missing_values(self,df_data):
+        """Fill missing values in data frame, in place."""
+        df_data.fillna(method="ffill", inplace=True)
+        df_data.fillna(method="bfill", inplace=True)
