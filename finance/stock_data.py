@@ -39,7 +39,6 @@ class StockData():
         normalized_code, pd.DataFrame
         '''
 
-        print(code)
         try:
             normalized_code = self.normalize_code(str(code))
         except Exception as e:
