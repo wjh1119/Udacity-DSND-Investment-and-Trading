@@ -29,7 +29,7 @@ def kline_chart(df_or_dfs, chart_name):
             mark_point=["max"],
             is_datazoom_show=True,
         )
-    elif type(df_or_dfs) == list:
+    elif type(df_or_dfs) == dict:
 
         for df_key in df_or_dfs.keys():
             
