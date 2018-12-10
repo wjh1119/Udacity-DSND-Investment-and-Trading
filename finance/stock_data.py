@@ -55,7 +55,7 @@ class StockData():
             security_start_date = security_info.start_date
             security_end_date = security_info.end_date
 
-            # compare security date and requery date
+            # compare date information of security and requery date
             if datetime.datetime.strptime(start_date,"%Y-%m-%d").date() < security_start_date:
                 start_date = security_start_date
             if datetime.datetime.strptime(end_date,"%Y-%m-%d").date() > security_end_date:
