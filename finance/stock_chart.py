@@ -23,7 +23,7 @@ def kline_chart(df_or_dfs, chart_name):
         date, data = change_df_to_chart_data(df_or_dfs)
 
         kline.add(
-            "日K",
+            "daily",
             date,
             data,
             is_datazoom_show=True,

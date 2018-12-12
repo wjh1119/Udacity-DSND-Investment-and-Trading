@@ -109,23 +109,20 @@ class ModelData():
         self._epochs_completed = 0
         self._index_in_epoch = 0
         
-    def normalize(self):
-        # normalize X
-        self._X=(self._X-np.mean(self._X,axis=0))/np.std(self._X,axis=0)  
-        
     
-    def train_test_split(self,test_size=0.25,validate_size=0.2):
+    def train_validate_test_split(self,validate_size=0.20,test_size=0.2):
+        validate_start = int(self._num_examples*(1-validate_size-test_size)) + 1
         test_start = int(self._num_examples*(1-test_size)) + 1
-        validate_start = int(len(self._num_examples)*(1-validate_size)) + 1
-        if test_start > self._num_examples or test_start > self._num_examples:
+        if validate_start > len(self._X) or test_start > len(self._X):
             pass
-        train_X,test_X,train_y,test_y = self._X[:test_start],self._X[test_start:],self._y[:test_start],self._y[test_start:]
-        validate_X, validate_y = self._X[validate_start:], self._y[validate_start:]
-
-        if validate_size == 0:
-            return ModelData(train_X,train_y,self._seed), ModelData(test_X,test_y,self._seed)
+        train_X,train_y = self._X[:validate_start],self._y[:validate_start]
+        validate_X, validate_y = self._X[validate_start:test_start],self._y[validate_start:test_start]
+        test_X,test_y = self._X[test_start:],self._y[test_start:]
+        
+        if test_size == 0:
+            return ModelData(train_X,train_y,self._seed), ModelData(validate_X,validate_y,self._seed)
         else:
-            return ModelData(train_X,train_y,self._seed), ModelData(test_X,test_y,self._seed), ModelData(validate_X,validate_y,self._seed)
+            return ModelData(train_X,train_y,self._seed), ModelData(validate_X,validate_y,self._seed), ModelData(test_X,test_y,self._seed)
         
         
     def next_batch(self, batch_size):

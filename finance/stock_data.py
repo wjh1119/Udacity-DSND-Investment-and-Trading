@@ -47,7 +47,7 @@ class StockData():
         
         if normalized_code == "000001.XSHE":
             price_df = pd.read_csv("finance/data/000001.SXHE.csv",index_col=0)
-            price_df = price_df.loc[start_date:end_date,:]
+            price_df = price_df.loc[start_date:end_date,['open', 'close', 'high', 'low', 'volume']]
         else:
             security_info = get_security_info(normalized_code)
             if security_info is None:
@@ -61,7 +61,7 @@ class StockData():
             if datetime.datetime.strptime(end_date,"%Y-%m-%d").date() > security_end_date:
                 end_date = security_end_date
 
-            price_df = get_price(normalized_code, start_date=start_date, end_date=end_date, frequency='daily', fields=None, 
+            price_df = get_price(normalized_code, start_date=start_date, end_date=end_date, frequency='daily', fields=['open', 'close', 'high', 'low', 'volume'], 
                                       skip_paused=False, fq='pre')
         self.fill_missing_values(price_df)
         
