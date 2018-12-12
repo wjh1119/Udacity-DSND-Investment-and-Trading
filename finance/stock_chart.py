@@ -26,7 +26,6 @@ def kline_chart(df_or_dfs, chart_name):
             "日K",
             date,
             data,
-            mark_point=["max"],
             is_datazoom_show=True,
         )
     elif type(df_or_dfs) == dict:
@@ -39,7 +38,6 @@ def kline_chart(df_or_dfs, chart_name):
                 df_key,
                 date,
                 data,
-                mark_point=["max"],
                 is_datazoom_show=True,
             )
 
