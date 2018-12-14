@@ -22,4 +22,5 @@ finance/config.ini
 # bat
 *.bat
 
-
+# model
+*.hdf5
