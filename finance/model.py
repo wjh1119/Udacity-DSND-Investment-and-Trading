@@ -21,11 +21,17 @@ from tensorflow.python.framework import random_seed
 
 class StockModel():
     def __init__(self, timesteps, input_dim):
-        '''initiate class
+        '''initiate class and build an LSTM model
+
+        Parameters
+        ----------------------------
+        timesteps: Training window of the LSTM model
+        input_dim: Number of features in the training data set
         '''
 
         # loss function
-        def mean_loss(y_true, y_pred):
+        def error_rate(y_true, y_pred):
+            '''Calculate the error rate between true value and predict value'''
             return self.evaluate(y_true, y_pred)
 
         # build LSTM model
@@ -34,11 +40,11 @@ class StockModel():
             model.add(LSTM(units, input_shape=(timesteps, input_dim)))
             model.add(Dropout(dropout))
             model.add(Dense(1))
-            model.compile(loss=mean_loss, optimizer=optimizer(lr))
+            model.compile(loss=error_rate, optimizer=optimizer(lr))
             model.summary()
             return model
 
-        # build LSTM model
+        # build an LSTM model
         model = build_model(units=256, dropout=0, optimizer=Adam, lr=0.001)
         self.model = model
 
@@ -48,21 +54,29 @@ class StockModel():
               verbose=1,
               save_file_path=None):
         '''train model
+
+        model_train_data: ModelData
+            include X_train and y_train
+        model_validate_data: ModelData
+            include X_validate and y_validate
+        verbose: 1 or 0
+            1: show the detail of process
+            0: don't show the detail of process
         '''
 
-        # process data's dimension
         y_train = model_train_data.y
         y_validate = model_validate_data.y
 
         X_train = model_train_data.X
         X_validate = model_validate_data.X
 
-        print(X_train.shape,y_train.shape,X_validate.shape,y_validate.shape)
-
+        # definite EarlyStopping for avoiding model overfitting
         early_stopping = EarlyStopping(
             monitor="val_loss", patience=50, verbose=verbose, mode="auto")
 
+        callbacks = []
         if save_file_path:
+            # definite ModelCheckpoint for avoiding model overfitting
             model_checkpoint = ModelCheckpoint(
                 save_file_path,
                 monitor='val_loss',
@@ -70,31 +84,32 @@ class StockModel():
                 save_best_only=True,
                 save_weights_only=False,
                 mode='auto')
-            self.model.fit(
-                X_train,
-                y_train,
-                epochs=1000,
-                batch_size=128,
-                validation_data=(X_validate, y_validate),
-                verbose=verbose,
-                callbacks=[early_stopping, model_checkpoint])
-            self.model.load_weights(save_file_path)
+            callbacks = [early_stopping, model_checkpoint]
+
         else:
-            self.model.fit(
-                X_train,
-                y_train,
-                validation_data=(X_validate, y_validate),
-                callbacks=[early_stopping])
+            callbacks = [early_stopping]
+
+        self.model.fit(
+            X_train,
+            y_train,
+            epochs=1000,
+            batch_size=128,
+            validation_data=(X_validate, y_validate),
+            verbose=verbose,
+            callbacks=callbacks)
+
+        if save_file_path:
+            self.model.load_weights(save_file_path)
 
         return self.model
 
     def evaluate(self, y_true, y_pred):
-        '''evaluate model
+        '''Calculate the error rate between true value and predict value
         '''
         return K.mean(K.abs(K.exp(y_pred - y_true) - 1), axis=1)
 
     def predict(self, model_test_data):
-        '''predict close price by given test data
+        '''predict close price by given testing data set
         '''
         y_predict = self.model.fit(model_test_data.X)
         close_price = np.exp(y_predict)
@@ -109,10 +124,25 @@ class StockModel():
         self.model = load_model(filepath)
 
 
-def get_rolling_data(X, y, train_period, predict_period):
+def get_rolling_data(df, train_period, predict_period):
+    '''Generating input and output data
+    
+    Parameters
+    ------------------------------
+    df: pd.DataFrame
+        source data
+    train_period: int
+        timesteps for LSTM model
+    predict_period: int
+        predcit on the nth day of the end of the training window
 
-    assert X.shape[0] == y.shape[0], ('X.shape: %s y.shape: %s' % (X.shape,
-                                                                   y.shape))
+    Returns
+    ------------------------------
+    input data X and output data y
+    '''
+
+    X = df
+    y = df['close']
 
     rolling_X, rolling_y = [], []
 
@@ -129,6 +159,7 @@ def get_rolling_data(X, y, train_period, predict_period):
 
 
 class ModelData():
+    '''Data for model train, predict and validate, '''
     def __init__(self, X, y, seed=None, shuffle=True):
         seed1, seed2 = random_seed.get_seed(seed)
         # If op level seed is not set, use whatever graph level seed is returned
@@ -152,6 +183,8 @@ class ModelData():
         self._index_in_epoch = 0
 
     def train_validate_test_split(self, validate_size=0.20, test_size=0.2):
+        '''Split data into training data, validate data, test data'''
+
         validate_start = int(self._num_examples *
                              (1 - validate_size - test_size)) + 1
         test_start = int(self._num_examples * (1 - test_size)) + 1
@@ -198,8 +231,12 @@ class ModelData():
 
     @property
     def X(self):
+        '''Return input data set'''
+        
         return self._X
 
     @property
     def y(self):
+        ''' Return output data set'''
+
         return self._y

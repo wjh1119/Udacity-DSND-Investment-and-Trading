@@ -3,11 +3,35 @@ import pandas as pd
 
 
 def kline_chart(df_or_dfs, chart_name):
+    '''Create a Kline chart by given data and chart's name
+    
+    Parameters
+    ---------------------------------
+    df_or_dfs: pd.DataFrame or list of pd.DataFrame
+        chart's data
+    chart_name: str
+        chart's name
+
+    Returns
+    --------------------------------
+    Kline chart or list of Kline chart 
+    '''
 
     kline = Kline(chart_name, width="100%")
 
     def change_df_to_chart_data(df):
-
+        '''Process raw data into data suitable for generating charts
+        
+        Parameters
+        -------------------------
+        df: pd.DataFrame
+            raw data
+        
+        Returns
+        -------------------------
+        date: list of date
+        data: daily data including opening price, closing price, low price and high price
+        '''
         date = df.index.tolist()
         data = []
         for idx in df.index:

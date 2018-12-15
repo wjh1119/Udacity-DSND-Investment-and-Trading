@@ -68,7 +68,7 @@ class StockData():
         return normalized_code, price_df
 
     def query_prices(self,query_str, start_date='2005-01-01', end_date='2018-11-30'):
-        ''' Get multiple stock's price data
+        ''' Get the data of prices of multiple stocks or funds
 
         Parameters
         ----------------------
@@ -81,7 +81,9 @@ class StockData():
             
         Returns
         ----------------------
-        normalized_codes, list of d.DataFrame, error_codes
+        normalized_codes: the codes of stocks or funds whose data of prices can be acquired
+        list of pd.DataFrame: list of the data of prices
+        error_codes: the codes of stocks or funds whose data of prices can't be acquired
 
         '''
 
