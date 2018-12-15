@@ -4,7 +4,7 @@ import os
 import datetime
 
 import configparser
-from jqdatasdk import *
+from jqdatasdk import get_price, normalize_code, get_security_info, auth
 
 class StockData():
     
@@ -12,7 +12,7 @@ class StockData():
         self.load_user_config()
     
     def load_user_config(self):
-        '''Add user information for getting stocks' data
+        '''Load user information for getting stocks' data
         '''
 
         cf = configparser.ConfigParser()
@@ -68,6 +68,22 @@ class StockData():
         return normalized_code, price_df
 
     def query_prices(self,query_str, start_date='2005-01-01', end_date='2018-11-30'):
+        ''' Get multiple stock's price data
+
+        Parameters
+        ----------------------
+        query_str: str
+            codes of stocks or funds
+        start_date: str
+            start_date
+        end_date: str
+            end_date
+            
+        Returns
+        ----------------------
+        normalized_codes, list of d.DataFrame, error_codes
+
+        '''
 
         # split query str
         query_codes = query_str.split(",")

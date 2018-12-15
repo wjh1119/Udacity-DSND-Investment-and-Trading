@@ -20,7 +20,7 @@ from tensorflow.python.framework import random_seed
 
 
 class StockModel():
-    def __init__(self, timesteps, imput_dim):
+    def __init__(self, timesteps, input_dim):
         '''initiate class
         '''
 
@@ -31,7 +31,7 @@ class StockModel():
         # build LSTM model
         def build_model(units=256, dropout=0.0, optimizer=Adam, lr=0.001):
             model = Sequential()
-            model.add(LSTM(units, input_length=timesteps, input_dim=imput_dim))
+            model.add(LSTM(units, input_shape=(timesteps, input_dim)))
             model.add(Dropout(dropout))
             model.add(Dense(1))
             model.compile(loss=mean_loss, optimizer=optimizer(lr))
@@ -46,23 +46,25 @@ class StockModel():
               model_train_data,
               model_validate_data,
               verbose=1,
-              save_filepath=None):
+              save_file_path=None):
         '''train model
         '''
 
         # process data's dimension
-        y_train = model_train_data.y[:, np.newaxis]
-        y_validate = model_validate_data.y[:, np.newaxis]
+        y_train = model_train_data.y
+        y_validate = model_validate_data.y
 
         X_train = model_train_data.X
         X_validate = model_validate_data.X
 
+        print(X_train.shape,y_train.shape,X_validate.shape,y_validate.shape)
+
         early_stopping = EarlyStopping(
             monitor="val_loss", patience=50, verbose=verbose, mode="auto")
 
-        if save_filepath:
+        if save_file_path:
             model_checkpoint = ModelCheckpoint(
-                save_filepath,
+                save_file_path,
                 monitor='val_loss',
                 verbose=1,
                 save_best_only=True,
@@ -76,7 +78,7 @@ class StockModel():
                 validation_data=(X_validate, y_validate),
                 verbose=verbose,
                 callbacks=[early_stopping, model_checkpoint])
-            self.model.load_weights(save_filepath)
+            self.model.load_weights(save_file_path)
         else:
             self.model.fit(
                 X_train,
