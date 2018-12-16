@@ -89,6 +89,8 @@ class StockModel():
         else:
             callbacks = [early_stopping]
 
+        print("Training model, please be patient.......")
+
         self.model.fit(
             X_train,
             y_train,
