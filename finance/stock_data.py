@@ -108,7 +108,7 @@ class StockData():
             if normalized_code:
                 return [normalized_code], price_df, []
             else:
-                print('Could not find price data of this code: %s' %
+                print('Could not find data of prices of this code: %s' %
                       query_codes[0])
                 return [], None, [query_codes[0]]
 
@@ -127,7 +127,7 @@ class StockData():
                     price_dfs[normalized_code] = price_df
                     normalized_codes.append(normalized_code)
                 else:
-                    print('Could not find price data of this code: %s' % code)
+                    print('Could not find data of prices of this code: %s' % code)
                     err_codes.append(code)
 
             if len(normalized_codes) == 0:

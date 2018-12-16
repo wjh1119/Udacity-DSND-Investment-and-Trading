@@ -39,15 +39,15 @@ def predict_price(code,
                                                       train_end_date,
                                                       predict_date)
 
-    # get price data
-    print("Getting price data of %s between %s and %s" %
+    # get data of prices
+    print("Getting data of prices of %s between %s and %s" %
           (code, train_start_date, train_end_date))
 
     sd = StockData()
     price_data = sd.get_price(
         code, start_date=train_start_date, end_date=train_end_date)[1]
     print(
-        "Successfully acquired data, the price data has %d samples and %d features"
+        "Successfully acquired data, the data of prices has %d samples and %d features"
         % (price_data.shape[0], price_data.shape[1]))
 
     # process data
