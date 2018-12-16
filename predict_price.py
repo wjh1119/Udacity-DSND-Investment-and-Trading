@@ -56,7 +56,6 @@ def predict_price(code,
     # get rolling dataset
     rolling_X, rolling_y = get_rolling_data(
         price_data,
-        price_data.iloc[:, 1],
         train_period=train_period,
         predict_period=predict_period)
 
