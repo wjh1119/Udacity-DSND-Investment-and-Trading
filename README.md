@@ -29,8 +29,6 @@ This project trains an LSTM model that can establish stock price indicators base
 > * **models/:** a folder of the model that has been trained
 
 ## 4. Results <a name="results"></a>  
-- The web app shows visualizations about data.
-- The web app can use the trained model to input text and return classification results  
 #### **How to run the script?**
 Before run the script:
 > 1. You need to apply for data trial qualification on [this website](https://www.joinquant.com/default/index/sdk?f=home&m=banner#jq-sdk-apply).
@@ -40,14 +38,15 @@ Before run the script:
 >
 >2. After the application is successful, you can fill in the username and password into **'finance/config.ini'** in the following format. If there is no such file, please create a new one.
 
->         `[user]
->account = your_user_name
->password = your_password
+>`[user]
+account = your_user_name
+password = your_password`
 
 
 Run the following command in the project's directory to run the script.   
->     `python predict_price.py "stock_code" "start_date_of_training_data" "the_end_date_of_training_data" "the_expected_predicted_date"`
-For example:   
+>     `python predict_price.py "stock_code" "start_date_of_training_data" "the_end_date_of_training_data" "the_expected_predicted_date"`  
+
+**For example**:   
 
 >     `python predict_price.py 000001.XSHG 2005-01-01 2018-11-30 2018-12-7`  
 
