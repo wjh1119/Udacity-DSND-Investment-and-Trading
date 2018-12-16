@@ -55,9 +55,7 @@ def predict_price(code,
 
     # get rolling dataset
     rolling_X, rolling_y = get_rolling_data(
-        price_data,
-        train_period=train_period,
-        predict_period=predict_period)
+        price_data, train_period=train_period, predict_period=predict_period)
 
     # modify and split data for model's training
     model_data = ModelData(rolling_X, rolling_y, seed=666, shuffle=False)

@@ -55,7 +55,7 @@ def kline_chart(df_or_dfs, chart_name):
     elif type(df_or_dfs) == dict:
 
         for df_key in df_or_dfs.keys():
-            
+
             date, data = change_df_to_chart_data(df_or_dfs[df_key])
 
             kline.add(

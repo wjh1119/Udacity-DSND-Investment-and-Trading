@@ -160,6 +160,7 @@ def get_rolling_data(df, train_period, predict_period):
 
 class ModelData():
     '''Data for model train, predict and validate, '''
+
     def __init__(self, X, y, seed=None, shuffle=True):
         seed1, seed2 = random_seed.get_seed(seed)
         # If op level seed is not set, use whatever graph level seed is returned
@@ -232,7 +233,7 @@ class ModelData():
     @property
     def X(self):
         '''Return input data set'''
-        
+
         return self._X
 
     @property
