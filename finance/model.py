@@ -80,7 +80,7 @@ class StockModel():
             model_checkpoint = ModelCheckpoint(
                 save_file_path,
                 monitor='val_loss',
-                verbose=1,
+                verbose=verbose,
                 save_best_only=True,
                 save_weights_only=False,
                 mode='auto')
