@@ -38,10 +38,8 @@ Before run the script:
 >
 >2. After the application is successful, you can fill in the username and password into **'finance/config.ini'** in the following format. If there is no such file, please create a new one.
 
->`[user]
-account = your_user_name
-password = your_password`
-
+> ![Image text](https://github.com/wjh2016/Udacity-DSND-Investment-and-Trading/blob/master/readme-img/config.png)  
+> Please replace 'your_user_name' and 'your_password' with your username and password.
 
 Run the following command in the project's directory to run the script.   
 >     `python predict_price.py "stock_code" "start_date_of_training_data" "the_end_date_of_training_data" "the_expected_predicted_date"`  
